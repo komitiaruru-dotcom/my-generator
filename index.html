@@ -121,8 +121,27 @@
                 </div>
             </section>
 
-            <!-- Output Section -->
-            <section id="output-container" class="space-y-8">
+            <!-- Loading State (centralized) -->
+            <div id="loading-state" class="hidden flex-col items-center justify-center text-center text-gray-500 h-full min-h-[300px] my-8">
+                <div class="loader"></div>
+                <p class="mt-4 text-lg font-semibold">AIが描写を生成中です...</p>
+                <p class="text-sm text-gray-400">素晴らしいアイデアを練っています</p>
+            </div>
+
+            <!-- History Title (appears after first generation) -->
+            <div id="history-title" class="hidden text-center my-8">
+                 <div class="inline-block glass-card rounded-2xl shadow-lg p-4 md:p-6">
+                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900">✨ 創作履歴</h2>
+                </div>
+            </div>
+
+            <!-- History Log Container -->
+            <section id="history-log" class="space-y-12">
+                <!-- New history blocks will be prepended here by JavaScript -->
+            </section>
+
+            <!-- Initial State (visible only at the beginning) -->
+            <section id="initial-state-container">
                 <div id="initial-state" class="glass-card flex flex-col items-center justify-center text-center text-gray-600 h-full rounded-2xl p-8 min-h-[300px]">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
@@ -130,76 +149,8 @@
                     <h2 class="text-xl font-bold mb-2">ここに描写のアイデアが表示されます</h2>
                     <p>上のボックスにテーマを入力し、「描写を生成」ボタンを押してください。</p>
                 </div>
-                
-                <div id="loading-state" class="hidden flex-col items-center justify-center text-center text-gray-500 h-full min-h-[300px]">
-                    <div class="loader"></div>
-                    <p class="mt-4 text-lg font-semibold">AIが描写を生成中です...</p>
-                    <p class="text-sm text-gray-400">素晴らしいアイデアを練っています</p>
-                </div>
-
-                <div id="results-state" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Cards will be injected here by JavaScript -->
-                </div>
-
-                <div id="short-story-section" class="hidden">
-                     <div class="story-card glass-card shadow-lg rounded-xl p-6 md:p-8" style="border-color: #d946ef;">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">✨ ショートストーリー生成</h2>
-                        <p class="text-gray-700 mb-6 text-sm">生成された描写をもとに、AIが短い物語を作成します。創作の次の一歩へ進むためのインスピレーションとしてご活用ください。</p>
-                        <button id="generate-story-btn" class="w-full bg-fuchsia-500 text-white font-bold py-3 px-4 rounded-lg shadow-md flex items-center justify-center text-lg hover:bg-fuchsia-600 transition disabled:bg-fuchsia-300 disabled:cursor-not-allowed">
-                            <span id="story-btn-text">この描写からショートストーリーを生成</span>
-                             <div id="story-btn-loader" class="hidden w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        </button>
-                        <div id="story-output-container" class="mt-6 hidden">
-                            <div id="story-output" class="p-4 bg-white/50 rounded-lg text-gray-800 border border-gray-200"></div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="character-ideas-section" class="hidden">
-                    <div class="character-card glass-card shadow-lg rounded-xl p-6 md:p-8" style="border-color: #f59e0b;">
-                       <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">✨ 登場人物のアイデア生成</h2>
-                       <p class="text-gray-700 mb-6 text-sm">この情景にぴったりのキャラクターをAIが創造します。物語のキャストを考えてみましょう。</p>
-                       <button id="generate-character-btn" class="w-full bg-amber-500 text-white font-bold py-3 px-4 rounded-lg shadow-md flex items-center justify-center text-lg hover:bg-amber-600 transition disabled:bg-amber-300 disabled:cursor-not-allowed">
-                           <span id="character-btn-text">登場人物を生成</span>
-                            <div id="character-btn-loader" class="hidden w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                       </button>
-                       <div id="character-output-container" class="mt-6 hidden">
-                           <div id="character-output" class="p-4 bg-white/50 rounded-lg text-gray-800 border border-gray-200"></div>
-                       </div>
-                   </div>
-               </div>
-
-                <div id="monologue-section" class="hidden">
-                    <div class="monologue-card glass-card shadow-lg rounded-xl p-6 md:p-8" style="border-color: #3b82f6;">
-                       <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">✨ 登場人物のモノローグ生成</h2>
-                       <p class="text-gray-700 mb-6 text-sm">この情景を体験している人物の心の声を生成します。キャラクターの感情を深く掘り下げましょう。</p>
-                       <button id="generate-monologue-btn" class="w-full bg-blue-500 text-white font-bold py-3 px-4 rounded-lg shadow-md flex items-center justify-center text-lg hover:bg-blue-600 transition disabled:bg-blue-300 disabled:cursor-not-allowed">
-                           <span id="monologue-btn-text">モノローグを生成</span>
-                            <div id="monologue-btn-loader" class="hidden w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                       </button>
-                       <div id="monologue-output-container" class="mt-6 hidden">
-                           <div id="monologue-output" class="p-4 bg-white/50 rounded-lg text-gray-800 border border-gray-200"></div>
-                       </div>
-                   </div>
-               </div>
-
-
-
-                <div id="plot-ideas-section" class="hidden">
-                     <div class="plot-card glass-card shadow-lg rounded-xl p-6 md:p-8" style="border-color: #f97316;">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">✨ 「次に何が起こる？」アイデア生成</h2>
-                        <p class="text-gray-700 mb-6 text-sm">物語の続きが思いつかない時に。AIが3つの異なる展開を提案し、プロットの構築を手助けします。</p>
-                        <button id="generate-plot-btn" class="w-full bg-orange-500 text-white font-bold py-3 px-4 rounded-lg shadow-md flex items-center justify-center text-lg hover:bg-orange-600 transition disabled:bg-orange-300 disabled:cursor-not-allowed">
-                            <span id="plot-btn-text">プロットアイデアを生成</span>
-                             <div id="plot-btn-loader" class="hidden w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                        </button>
-                        <div id="plot-output-container" class="mt-6 hidden">
-                            <div id="plot-output" class="p-4 bg-white/50 rounded-lg text-gray-800 border border-gray-200"></div>
-                        </div>
-                    </div>
-                </div>
-
             </section>
+
         </main>
 
         <footer class="text-center text-xs text-white/80 mt-8">
@@ -209,47 +160,21 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
             const sceneInput = document.getElementById('scene-input');
             const generateBtn = document.getElementById('generate-btn');
             const btnText = document.getElementById('btn-text');
             const btnLoader = document.getElementById('btn-loader');
-
-            const initialState = document.getElementById('initial-state');
+            
             const loadingState = document.getElementById('loading-state');
-            const resultsState = document.getElementById('results-state');
+            const initialStateContainer = document.getElementById('initial-state-container');
+            const historyLog = document.getElementById('history-log');
+            const historyTitle = document.getElementById('history-title');
 
-            const shortStorySection = document.getElementById('short-story-section');
-            const generateStoryBtn = document.getElementById('generate-story-btn');
-            const storyBtnText = document.getElementById('story-btn-text');
-            const storyBtnLoader = document.getElementById('story-btn-loader');
-            const storyOutputContainer = document.getElementById('story-output-container');
-            const storyOutput = document.getElementById('story-output');
-
-            const characterIdeasSection = document.getElementById('character-ideas-section');
-            const generateCharacterBtn = document.getElementById('generate-character-btn');
-            const characterBtnText = document.getElementById('character-btn-text');
-            const characterBtnLoader = document.getElementById('character-btn-loader');
-            const characterOutputContainer = document.getElementById('character-output-container');
-            const characterOutput = document.getElementById('character-output');
-
-            const monologueSection = document.getElementById('monologue-section');
-            const generateMonologueBtn = document.getElementById('generate-monologue-btn');
-            const monologueBtnText = document.getElementById('monologue-btn-text');
-            const monologueBtnLoader = document.getElementById('monologue-btn-loader');
-            const monologueOutputContainer = document.getElementById('monologue-output-container');
-            const monologueOutput = document.getElementById('monologue-output');
-
-
-
-            const plotIdeasSection = document.getElementById('plot-ideas-section');
-            const generatePlotBtn = document.getElementById('generate-plot-btn');
-            const plotBtnText = document.getElementById('plot-btn-text');
-            const plotBtnLoader = document.getElementById('plot-btn-loader');
-            const plotOutputContainer = document.getElementById('plot-output-container');
-            const plotOutput = document.getElementById('plot-output');
-
-            let lastGeneratedDescriptions = null;
+            // --- API & Config ---
+            let historyCounter = 0; // To create unique IDs
             const apiKey = "AIzaSyAHltGAm3g3C6Jx0rZ_xWYXSLLWwYSFZtE";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             const senseConfig = {
                 sight: { title: "視覚 - Sight", color: "#3b82f6", icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>` },
@@ -258,7 +183,8 @@
                 taste: { title: "味覚 - Taste", color: "#ef4444", icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18a6 6 0 006-6H6a6 6 0 006 6z" /><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v1m0 16v-2m-7.071-7.071H3m18 0h-1.929M5.636 5.636L4.222 4.222m15.556 15.556l-1.414-1.414M12 4a8 8 0 018 8h-2a6 6 0 00-6-6V4z" /></svg>` },
                 touch: { title: "触覚 - Touch", color: "#8b5cf6", icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>` }
             };
-            
+
+            // --- Event Listeners ---
             const exampleBtns = document.querySelectorAll('.example-btn');
             exampleBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -268,33 +194,19 @@
             });
 
             generateBtn.addEventListener('click', async () => {
-                console.log('Generate button clicked.'); // Debugging line
                 const scene = sceneInput.value.trim();
                 if (!scene) {
                     alert('情景・テーマを入力してください。');
                     return;
                 }
 
-                // UI to loading state
-                generateBtn.disabled = true;
-                btnText.classList.add('hidden');
-                btnLoader.classList.remove('hidden');
-                initialState.classList.add('hidden');
-                resultsState.classList.remove('visible', 'grid');
-                resultsState.classList.add('hidden');
-                [shortStorySection, plotIdeasSection, monologueSection, characterIdeasSection].forEach(section => {
-                    section.classList.add('hidden');
-                    section.classList.remove('visible');
-                });
-                loadingState.classList.remove('hidden');
-                loadingState.classList.add('flex');
+                setLoadingState(true);
 
                 const systemPrompt = `あなたはプロの作家であり、情景描写の達人です。ユーザーが提示したお題や情景に対して、五感（視覚、聴覚、嗅覚、味覚、触覚）をフル活用した、具体的で詩的な描写のアイデアをそれぞれ3～5個ずつ提供してください。`;
                 const userQuery = `お題: ${scene}`;
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 
                 try {
-                     const payload = {
+                    const payload = {
                         contents: [{ parts: [{ text: userQuery }] }],
                         systemInstruction: { parts: [{ text: systemPrompt }] },
                         generationConfig: {
@@ -320,260 +232,281 @@
 
                     if (jsonText) {
                         const descriptions = JSON.parse(jsonText);
-                        lastGeneratedDescriptions = descriptions; // Save for story generation
-                        displayResults(descriptions);
+                        addHistoryBlock(scene, descriptions);
                     } else {
                          throw new Error('AIからの応答が不正です。');
                     }
 
                 } catch (error) {
                     console.error('Error generating descriptions:', error);
-                    displayError();
+                    displayError(scene);
                 } finally {
+                    setLoadingState(false);
+                }
+            });
+
+            // --- UI Update Functions ---
+            function setLoadingState(isLoading) {
+                if (isLoading) {
+                    generateBtn.disabled = true;
+                    btnText.classList.add('hidden');
+                    btnLoader.classList.remove('hidden');
+                    initialStateContainer.classList.add('hidden');
+                    loadingState.classList.remove('hidden');
+                    loadingState.classList.add('flex');
+                } else {
                     generateBtn.disabled = false;
                     btnText.classList.remove('hidden');
                     btnLoader.classList.add('hidden');
                     loadingState.classList.add('hidden');
                     loadingState.classList.remove('flex');
                 }
-            });
+            }
 
-             generateStoryBtn.addEventListener('click', async () => {
-                const scene = sceneInput.value.trim();
-                if (!scene || !lastGeneratedDescriptions) return;
+            function addHistoryBlock(scene, descriptions) {
+                historyCounter++;
+                const blockId = `history-${historyCounter}`;
 
-                generateStoryBtn.disabled = true;
-                storyBtnText.classList.add('hidden');
-                storyBtnLoader.classList.remove('hidden');
-                storyOutputContainer.classList.remove('hidden');
-                storyOutput.textContent = '物語を紡いでいます...';
-
-                const sensoryDetails = Object.entries(lastGeneratedDescriptions)
-                    .filter(([, values]) => values.length > 0)
-                    .map(([sense, values]) => `${senseConfig[sense].title}: ${values.join(', ')}`)
-                    .join('\n');
-
-                const systemPrompt = `あなたは創造力豊かな作家です。与えられたテーマと五感の描写を基に、読者の心を引き込むような短い物語（200～300字程度）を創作してください。情景だけでなく、キャラクターの心情や行動も少し含めると、より魅力的な物語になります。`;
-                const userQuery = `テーマ: ${scene}\n\n五感の描写:\n${sensoryDetails}`;
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                try {
-                    const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-
-                    if (!response.ok) { throw new Error(`API Error: ${response.statusText}`); }
-                    const result = await response.json();
-                    const storyText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                    if(storyText) {
-                        storyOutput.textContent = storyText;
-                    } else {
-                        throw new Error('AIからの応答が不正です。');
-                    }
-                } catch (error) {
-                    console.error('Error generating story:', error);
-                    storyOutput.textContent = '物語の生成中にエラーが発生しました。';
-                } finally {
-                    generateStoryBtn.disabled = false;
-                    storyBtnText.classList.remove('hidden');
-                    storyBtnLoader.classList.add('hidden');
+                if (historyTitle.classList.contains('hidden')) {
+                    historyTitle.classList.remove('hidden');
                 }
-            });
-            
-            generateCharacterBtn.addEventListener('click', async () => {
-                const scene = sceneInput.value.trim();
-                if (!scene) return;
 
-                generateCharacterBtn.disabled = true;
-                characterBtnText.classList.add('hidden');
-                characterBtnLoader.classList.remove('hidden');
-                characterOutputContainer.classList.remove('hidden');
-                characterOutput.textContent = '魅力的な人物を考案中...';
+                const historyBlock = document.createElement('div');
+                historyBlock.id = blockId;
+                historyBlock.className = 'glass-card rounded-2xl shadow-lg';
                 
-                const systemPrompt = `あなたはプロのキャラクターデザイナーです。与えられたテーマの情景にふさわしい、ユニークで魅力的な登場人物を一人作成してください。以下の項目について、具体的に記述してください。`;
-                const userQuery = `テーマ: ${scene}`;
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const timestamp = new Date().toLocaleString('ja-JP');
 
-                try {
-                     const payload = {
-                        contents: [{ parts: [{ text: userQuery }] }],
-                        systemInstruction: { parts: [{ text: systemPrompt }] },
-                        generationConfig: {
-                            responseMimeType: "application/json",
-                            responseSchema: {
-                                type: "OBJECT",
-                                properties: {
-                                    name: { type: "STRING", description: "キャラクターの名前" },
-                                    appearance: { type: "STRING", description: "キャラクターの外見、服装などの特徴" },
-                                    personality: { type: "STRING", description: "キャラクターの性格、口調などの特徴" },
-                                    reason: { type: "STRING", description: "そのキャラクターがなぜその場所にいるのかの理由" },
-                                }
-                            }
-                        }
-                    };
+                historyBlock.innerHTML = `
+                    <div class="history-header p-6 cursor-pointer border-b border-gray-300">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-sm text-gray-600">${timestamp}</p>
+                                <h3 class="text-xl font-bold text-gray-800 mt-2">テーマ: 「${scene}」</h3>
+                            </div>
+                            <svg class="w-6 h-6 text-gray-600 transition-transform transform rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="history-content p-6 md:p-8 space-y-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="results-${blockId}">
+                        </div>
+                        <div class="space-y-6" id="actions-${blockId}">
+                        </div>
+                    </div>
+                `;
 
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                    if (!response.ok) { throw new Error(`API Error: ${response.statusText}`); }
-                    
-                    const result = await response.json();
-                    const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                    
-                    if (jsonText) {
-                        const char = JSON.parse(jsonText);
-                        characterOutput.innerHTML = `
-                            <p><strong class="font-semibold text-gray-900">名前:</strong> ${char.name || '未設定'}</p>
-                            <p><strong class="font-semibold text-gray-900">外見:</strong> ${char.appearance || '未設定'}</p>
-                            <p><strong class="font-semibold text-gray-900">性格:</strong> ${char.personality || '未設定'}</p>
-                            <p><strong class="font-semibold text-gray-900">この場所にいる理由:</strong> ${char.reason || '未設定'}</p>
-                        `;
-                    } else {
-                         throw new Error('AIからの応答が不正です。');
-                    }
-                } catch (error) {
-                    console.error('Error generating character:', error);
-                    characterOutput.textContent = '登場人物の生成中にエラーが発生しました。';
-                } finally {
-                    generateCharacterBtn.disabled = false;
-                    characterBtnText.classList.remove('hidden');
-                    characterBtnLoader.classList.add('hidden');
-                }
-            });
+                historyLog.prepend(historyBlock);
 
-            generateMonologueBtn.addEventListener('click', async () => {
-                const scene = sceneInput.value.trim();
-                const story = storyOutput.textContent;
-                if (!scene) return;
-
-                generateMonologueBtn.disabled = true;
-                monologueBtnText.classList.add('hidden');
-                monologueBtnLoader.classList.remove('hidden');
-                monologueOutputContainer.classList.remove('hidden');
-                monologueOutput.textContent = 'キャラクターの心の声を探っています...';
-                
-                const systemPrompt = `あなたはキャラクターの感情を描写するのが得意な小説家です。与えられたテーマ、情景描写、そして短い物語を基に、その場にいる人物の視点から、心の声や感情が伝わる短いモノローグ（150～200字程度）を創作してください。`;
-                const userQuery = `テーマ: ${scene}\n\n物語の状況:\n${story.includes('生成中') || story.includes('エラー') ? '（物語はまだ生成されていませんが、このテーマの情景です）' : story}`;
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                try {
-                    const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-
-                    if (!response.ok) { throw new Error(`API Error: ${response.statusText}`); }
-                    const result = await response.json();
-                    const monologueText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                    if(monologueText) {
-                        monologueOutput.textContent = monologueText;
-                    } else {
-                        throw new Error('AIからの応答が不正です。');
-                    }
-                } catch (error) {
-                    console.error('Error generating monologue:', error);
-                    monologueOutput.textContent = 'モノローグの生成中にエラーが発生しました。';
-                } finally {
-                    generateMonologueBtn.disabled = false;
-                    monologueBtnText.classList.remove('hidden');
-                    monologueBtnLoader.classList.add('hidden');
-                }
-            });
-
-            generatePlotBtn.addEventListener('click', async () => {
-                const scene = sceneInput.value.trim();
-                const story = storyOutput.textContent;
-                if (!scene) return;
-
-                generatePlotBtn.disabled = true;
-                plotBtnText.classList.add('hidden');
-                plotBtnLoader.classList.remove('hidden');
-                plotOutputContainer.classList.remove('hidden');
-                plotOutput.textContent = '物語の新たな可能性を探っています...';
-
-                const systemPrompt = `あなたは経験豊富な編集者であり、ストーリーテラーです。与えられたテーマと物語の冒頭部分を基に、「次に何が起こるか」についての興味をそそるプロットのアイデアを3つ、箇条書きで提案してください。それぞれのアイデアは、物語を異なる方向へ導くユニークなものであるべきです。`;
-                const userQuery = `テーマ: ${scene}\n\n物語の冒頭:\n${story.includes('生成中') || story.includes('エラー') ? '（物語はまだ生成されていません）' : story}`;
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                 try {
-                    const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-
-                    if (!response.ok) { throw new Error(`API Error: ${response.statusText}`); }
-                    const result = await response.json();
-                    const plotText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                    if(plotText) {
-                        plotOutput.textContent = plotText;
-                    } else {
-                        throw new Error('AIからの応答が不正です。');
-                    }
-                } catch (error) {
-                    console.error('Error generating plot ideas:', error);
-                    plotOutput.textContent = 'プロットアイデアの生成中にエラーが発生しました。';
-                } finally {
-                    generatePlotBtn.disabled = false;
-                    plotBtnText.classList.remove('hidden');
-                    plotBtnLoader.classList.add('hidden');
-                }
-            });
-
-
-            
-            function displayResults(descriptions) {
-                resultsState.innerHTML = '';
-                
+                const resultsContainer = historyBlock.querySelector(`#results-${blockId}`);
                 for (const sense in senseConfig) {
                     if (descriptions[sense] && descriptions[sense].length > 0) {
                         const card = createSenseCard(sense, descriptions[sense]);
-                        resultsState.appendChild(card);
+                        resultsContainer.appendChild(card);
                     }
                 }
                 
-                resultsState.classList.remove('hidden');
-                resultsState.classList.add('grid');
-                setTimeout(() => resultsState.classList.add('visible'), 10);
+                const actionsContainer = historyBlock.querySelector(`#actions-${blockId}`);
                 
-                // Show subsequent sections
-                [shortStorySection, characterIdeasSection, monologueSection, plotIdeasSection].forEach(section => {
-                    const outputContainer = section.querySelector('div[id$="-output-container"]');
-                    const output = section.querySelector('div[id$="-output"]');
-                    outputContainer.classList.add('hidden');
-                    output.textContent = '';
-                    section.classList.remove('hidden');
-                    setTimeout(() => section.classList.add('visible'), 10);
+                const storySection = createActionSection('story', 'ショートストーリー生成', '#d946ef', 'この描写からショートストーリーを生成', '生成された描写をもとに、AIが短い物語を作成します。', blockId, scene, descriptions);
+                const characterSection = createActionSection('character', '登場人物のアイデア生成', '#f59e0b', '登場人物を生成', 'この情景にぴったりのキャラクターをAIが創造します。', blockId, scene, descriptions);
+                const monologueSection = createActionSection('monologue', '登場人物のモノローグ生成', '#3b82f6', 'モノローグを生成', 'この情景を体験している人物の心の声を生成します。', blockId, scene, descriptions);
+                const plotSection = createActionSection('plot', '「次に何が起こる？」アイデア生成', '#f97316', 'プロットアイデアを生成', '物語の続きが思いつかない時に。AIが3つの異なる展開を提案します。', blockId, scene, descriptions);
+
+                actionsContainer.appendChild(storySection);
+                actionsContainer.appendChild(characterSection);
+                actionsContainer.appendChild(monologueSection);
+                actionsContainer.appendChild(plotSection);
+
+                // Collapsible logic
+                const header = historyBlock.querySelector('.history-header');
+                const content = historyBlock.querySelector('.history-content');
+                const icon = header.querySelector('svg');
+
+                header.addEventListener('click', () => {
+                    content.classList.toggle('hidden');
+                    icon.classList.toggle('rotate-180');
                 });
+
+                // Start open, then fade in
+                historyBlock.style.opacity = 0;
+                setTimeout(() => { historyBlock.style.transition = 'opacity 0.5s ease-in-out'; historyBlock.style.opacity = 1; }, 10);
             }
-            
+
             function createSenseCard(sense, items) {
                 const config = senseConfig[sense];
                 const cardDiv = document.createElement('div');
                 cardDiv.className = 'output-card glass-card shadow-lg rounded-xl';
                 cardDiv.style.borderColor = config.color;
-
-                const listItems = items.map(item => `<li class="pb-1">${item}</li>`).join('');
-
+                const listItems = items.map(item => `<li class="pb-1">${item.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</li>`).join('');
                 cardDiv.innerHTML = `
                     <div class="p-5">
                         <div class="flex items-center mb-3" style="color: ${config.color};">
                             ${config.icon}
                             <h2 class="text-xl font-bold">${config.title}</h2>
                         </div>
-                        <ul class="list-disc list-inside space-y-2 text-gray-700 pl-2">
-                            ${listItems}
-                        </ul>
+                        <ul class="list-disc list-inside space-y-2 text-gray-700 pl-2">${listItems}</ul>
                     </div>
                 `;
                 return cardDiv;
             }
             
-            function displayError() {
-                resultsState.classList.add('hidden');
-                resultsState.classList.remove('visible', 'grid');
-                [shortStorySection, plotIdeasSection, monologueSection, characterIdeasSection].forEach(section => {
-                     section.classList.add('hidden');
-                     section.classList.remove('visible');
+            function createActionSection(type, title, color, buttonText, description, blockId, scene, descriptions) {
+                const sectionId = `${type}-${blockId}`;
+                const sectionDiv = document.createElement('div');
+                sectionDiv.className = `${type}-card glass-card shadow-lg rounded-xl p-6 md:p-8`;
+                sectionDiv.style.borderColor = color;
+
+                sectionDiv.innerHTML = `
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">✨ ${title}</h2>
+                    <p class="text-gray-700 mb-6 text-sm">${description}</p>
+                    <button id="btn-${sectionId}" class="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md flex items-center justify-center text-lg transition" style="background-color: ${color};">
+                        <span id="btn-text-${sectionId}">${buttonText}</span>
+                        <div id="btn-loader-${sectionId}" class="hidden w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </button>
+                    <div id="output-container-${sectionId}" class="mt-6 hidden">
+                        <div id="output-${sectionId}" class="p-4 bg-white/50 rounded-lg text-gray-800 border border-gray-200 whitespace-pre-wrap line-height-1.75"></div>
+                    </div>
+                `;
+                
+                const generateBtn = sectionDiv.querySelector(`#btn-${sectionId}`);
+                generateBtn.addEventListener('click', async () => {
+                    await handleActionClick(sectionId, type, scene, descriptions);
                 });
-                initialState.classList.remove('hidden');
-                initialState.querySelector('h2').textContent = "エラーが発生しました";
-                initialState.querySelector('p').textContent = "描写の生成に失敗しました。時間をおいて再度お試しください。";
+
+                return sectionDiv;
+            }
+
+            async function handleActionClick(sectionId, type, scene, descriptions) {
+                const btn = document.getElementById(`btn-${sectionId}`);
+                const btnText = document.getElementById(`btn-text-${sectionId}`);
+                const btnLoader = document.getElementById(`btn-loader-${sectionId}`);
+                const outputContainer = document.getElementById(`output-container-${sectionId}`);
+                const outputDiv = document.getElementById(`output-${sectionId}`);
+
+                btn.disabled = true;
+                btnText.classList.add('hidden');
+                btnLoader.classList.remove('hidden');
+                outputContainer.classList.remove('hidden');
+                outputDiv.textContent = '生成中...';
+
+                try {
+                    const { systemPrompt, userQuery, generationConfig } = getActionConfig(type, scene, descriptions, outputDiv.textContent);
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: userQuery }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] },
+                        ...(generationConfig && { generationConfig })
+                    };
+
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+                    
+                    const result = await response.json();
+                    const responseText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                    if (responseText) {
+                        processActionResponse(type, responseText, outputDiv);
+                    } else {
+                        throw new Error('AIからの応答が不正です。');
+                    }
+                } catch (error) {
+                    console.error(`Error generating ${type}:`, error);
+                    outputDiv.textContent = `エラーが発生しました: ${error.message}`;
+                } finally {
+                    btn.disabled = false;
+                    btnText.classList.remove('hidden');
+                    btnLoader.classList.add('hidden');
+                }
+            }
+
+            function getActionConfig(type, scene, descriptions, storyText) {
+                const sensoryDetails = Object.entries(descriptions)
+                    .filter(([, values]) => values.length > 0)
+                    .map(([sense, values]) => `${senseConfig[sense].title}: ${values.join(', ')}`)
+                    .join('\n');
+
+                switch (type) {
+                    case 'story':
+                        return {
+                            systemPrompt: `あなたは創造力豊かな作家です。与えられたテーマと五感の描写を基に、読者の心を引き込むような短い物語（200～300字程度）を創作してください。情景だけでなく、キャラクターの心情や行動も少し含めると、より魅力的な物語になります。`,
+                            userQuery: `テーマ: ${scene}\n\n五感の描写:\n${sensoryDetails}`
+                        };
+                    case 'character':
+                        return {
+                            systemPrompt: `あなたはプロのキャラクターデザイナーです。与えられたテーマの情景にふさわしい、ユニークで魅力的な登場人物を一人作成してください。以下の項目について、具体的に記述してください。`,
+                            userQuery: `テーマ: ${scene}`,
+                            generationConfig: {
+                                responseMimeType: "application/json",
+                                responseSchema: {
+                                    type: "OBJECT",
+                                    properties: {
+                                        name: { type: "STRING", description: "キャラクターの名前" },
+                                        appearance: { type: "STRING", description: "キャラクターの外見、服装などの特徴" },
+                                        personality: { type: "STRING", description: "キャラクターの性格、口調などの特徴" },
+                                        reason: { type: "STRING", description: "そのキャラクターがなぜその場所にいるのかの理由" },
+                                    }
+                                }
+                            }
+                        };
+                    case 'monologue':
+                        return {
+                            systemPrompt: `あなたはキャラクターの感情を描写するのが得意な小説家です。与えられたテーマ、情景描写、そして短い物語を基に、その場にいる人物の視点から、心の声や感情が伝わる短いモノローグ（150～200字程度）を創作してください。`,
+                            userQuery: `テーマ: ${scene}\n\n物語の状況:\n${storyText.includes('生成中') || storyText.includes('エラー') ? '（物語はまだ生成されていませんが、このテーマの情景です）' : storyText}`
+                        };
+                    case 'plot':
+                        return {
+                            systemPrompt: `あなたは経験豊富な編集者であり、ストーリーテラーです。与えられたテーマと物語の冒頭部分を基に、「次に何が起こるか」についての興味をそそるプロットのアイデアを3つ、箇条書きで提案してください。それぞれのアイデアは、物語を異なる方向へ導くユニークなものであるべきです。`,
+                            userQuery: `テーマ: ${scene}\n\n物語の冒頭:\n${storyText.includes('生成中') || storyText.includes('エラー') ? '（物語はまだ生成されていません）' : storyText}`
+                        };
+                    default:
+                        return {};
+                }
+            }
+
+            function processActionResponse(type, responseText, outputDiv) {
+                if (type === 'character') {
+                    const char = JSON.parse(responseText);
+                    outputDiv.innerHTML = `
+                        <p><strong class="font-semibold text-gray-900">名前:</strong> ${char.name || '未設定'}</p>
+                        <p><strong class="font-semibold text-gray-900">外見:</strong> ${char.appearance || '未設定'}</p>
+                        <p><strong class="font-semibold text-gray-900">性格:</strong> ${char.personality || '未設定'}</p>
+                        <p><strong class="font-semibold text-gray-900">この場所にいる理由:</strong> ${char.reason || '未設定'}</p>
+                    `;
+                } else {
+                    outputDiv.textContent = responseText;
+                }
+            }
+            
+            function displayError(scene) {
+                historyCounter++;
+                const blockId = `history-${historyCounter}`;
+
+                if (historyTitle.classList.contains('hidden')) {
+                    historyTitle.classList.remove('hidden');
+                }
+
+                const errorBlock = document.createElement('div');
+                errorBlock.id = blockId;
+                errorBlock.className = 'glass-card rounded-2xl shadow-lg p-6 md:p-8 space-y-4';
+                
+                const timestamp = new Date().toLocaleString('ja-JP');
+
+                errorBlock.innerHTML = `
+                    <div class="border-b border-red-300 pb-4">
+                        <p class="text-sm text-gray-600">${timestamp}</p>
+                        <h3 class="text-xl font-bold text-red-600 mt-2">テーマ: 「${scene}」</h3>
+                    </div>
+                    <div class="flex flex-col items-center justify-center text-center text-red-600 h-full rounded-2xl p-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h2 class="text-xl font-bold mb-2">エラーが発生しました</h2>
+                        <p>描写の生成に失敗しました。時間をおいて再度お試しください。</p>
+                    </div>
+                `;
+                historyLog.prepend(errorBlock);
             }
         });
     </script>
