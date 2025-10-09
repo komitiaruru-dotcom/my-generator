@@ -131,7 +131,15 @@
             <!-- History Title (appears after first generation) -->
             <div id="history-title" class="hidden text-center my-8">
                  <div class="inline-block glass-card rounded-2xl shadow-lg p-4 md:p-6">
-                    <h2 class="text-2xl md:text-3xl font-bold text-gray-900">✨ 創作履歴</h2>
+                    <div class="flex items-center justify-between gap-8">
+                        <h2 class="text-2xl md:text-3xl font-bold text-gray-900">✨ 創作履歴</h2>
+                        <button id="clear-history-btn" class="text-sm text-red-500 hover:text-red-700 hover:bg-red-100 rounded-lg p-2 transition-colors flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                            履歴をクリア
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -170,9 +178,13 @@
             const initialStateContainer = document.getElementById('initial-state-container');
             const historyLog = document.getElementById('history-log');
             const historyTitle = document.getElementById('history-title');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+
+            // --- State & History Management ---
+            let historyData = [];
+            const HISTORY_STORAGE_KEY = 'creativeWritingHistory';
 
             // --- API & Config ---
-            let historyCounter = 0; // To create unique IDs
             const apiKey = "AIzaSyAHltGAm3g3C6Jx0rZ_xWYXSLLWwYSFZtE";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
@@ -184,7 +196,35 @@
                 touch: { title: "触覚 - Touch", color: "#8b5cf6", icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg>` }
             };
 
+            // --- History Functions ---
+            function saveHistory() {
+                localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(historyData));
+            }
+
+            function loadHistory() {
+                const savedHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
+                if (savedHistory) {
+                    historyData = JSON.parse(savedHistory);
+                    if (historyData.length > 0) {
+                        historyLog.innerHTML = ''; // Clear initial state message
+                        historyData.forEach(entry => addHistoryBlock(entry, false));
+                    }
+                }
+            }
+
             // --- Event Listeners ---
+            loadHistory(); // Load history on page start
+
+            clearHistoryBtn.addEventListener('click', () => {
+                if (confirm('本当にすべての履歴を削除しますか？この操作は元に戻せません。')) {
+                    localStorage.removeItem(HISTORY_STORAGE_KEY);
+                    historyData = [];
+                    historyLog.innerHTML = '';
+                    historyTitle.classList.add('hidden');
+                    initialStateContainer.classList.remove('hidden');
+                }
+            });
+
             const exampleBtns = document.querySelectorAll('.example-btn');
             exampleBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -232,7 +272,13 @@
 
                     if (jsonText) {
                         const descriptions = JSON.parse(jsonText);
-                        addHistoryBlock(scene, descriptions);
+                        const newEntry = {
+                            id: Date.now(), // Unique ID
+                            scene: scene,
+                            descriptions: descriptions,
+                            timestamp: new Date().toLocaleString('ja-JP')
+                        };
+                        addHistoryBlock(newEntry, true);
                     } else {
                          throw new Error('AIからの応答が不正です。');
                     }
@@ -263,26 +309,24 @@
                 }
             }
 
-            function addHistoryBlock(scene, descriptions) {
-                historyCounter++;
-                const blockId = `history-${historyCounter}`;
+            function addHistoryBlock(entry, save = true) {
+                const blockId = `history-${entry.id}`;
 
                 if (historyTitle.classList.contains('hidden')) {
                     historyTitle.classList.remove('hidden');
+                    initialStateContainer.classList.add('hidden');
                 }
 
                 const historyBlock = document.createElement('div');
                 historyBlock.id = blockId;
                 historyBlock.className = 'glass-card rounded-2xl shadow-lg';
                 
-                const timestamp = new Date().toLocaleString('ja-JP');
-
                 historyBlock.innerHTML = `
                     <div class="history-header p-6 cursor-pointer border-b border-gray-300">
                         <div class="flex justify-between items-center">
                             <div>
-                                <p class="text-sm text-gray-600">${timestamp}</p>
-                                <h3 class="text-xl font-bold text-gray-800 mt-2">テーマ: 「${scene}」</h3>
+                                <p class="text-sm text-gray-600">${entry.timestamp}</p>
+                                <h3 class="text-xl font-bold text-gray-800 mt-2">テーマ: 「${entry.scene}」</h3>
                             </div>
                             <svg class="w-6 h-6 text-gray-600 transition-transform transform rotate-180" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -301,18 +345,18 @@
 
                 const resultsContainer = historyBlock.querySelector(`#results-${blockId}`);
                 for (const sense in senseConfig) {
-                    if (descriptions[sense] && descriptions[sense].length > 0) {
-                        const card = createSenseCard(sense, descriptions[sense]);
+                    if (entry.descriptions[sense] && entry.descriptions[sense].length > 0) {
+                        const card = createSenseCard(sense, entry.descriptions[sense]);
                         resultsContainer.appendChild(card);
                     }
                 }
                 
                 const actionsContainer = historyBlock.querySelector(`#actions-${blockId}`);
                 
-                const storySection = createActionSection('story', 'ショートストーリー生成', '#d946ef', 'この描写からショートストーリーを生成', '生成された描写をもとに、AIが短い物語を作成します。', blockId, scene, descriptions);
-                const characterSection = createActionSection('character', '登場人物のアイデア生成', '#f59e0b', '登場人物を生成', 'この情景にぴったりのキャラクターをAIが創造します。', blockId, scene, descriptions);
-                const monologueSection = createActionSection('monologue', '登場人物のモノローグ生成', '#3b82f6', 'モノローグを生成', 'この情景を体験している人物の心の声を生成します。', blockId, scene, descriptions);
-                const plotSection = createActionSection('plot', '「次に何が起こる？」アイデア生成', '#f97316', 'プロットアイデアを生成', '物語の続きが思いつかない時に。AIが3つの異なる展開を提案します。', blockId, scene, descriptions);
+                const storySection = createActionSection('story', 'ショートストーリー生成', '#d946ef', 'この描写からショートストーリーを生成', '生成された描写をもとに、AIが短い物語を作成します。', blockId, entry.scene, entry.descriptions);
+                const characterSection = createActionSection('character', '登場人物のアイデア生成', '#f59e0b', '登場人物を生成', 'この情景にぴったりのキャラクターをAIが創造します。', blockId, entry.scene, entry.descriptions);
+                const monologueSection = createActionSection('monologue', '登場人物のモノローグ生成', '#3b82f6', 'モノローグを生成', 'この情景を体験している人物の心の声を生成します。', blockId, entry.scene, entry.descriptions);
+                const plotSection = createActionSection('plot', '「次に何が起こる？」アイデア生成', '#f97316', 'プロットアイデアを生成', '物語の続きが思いつかない時に。AIが3つの異なる展開を提案します。', blockId, entry.scene, entry.descriptions);
 
                 actionsContainer.appendChild(storySection);
                 actionsContainer.appendChild(characterSection);
@@ -332,6 +376,11 @@
                 // Start open, then fade in
                 historyBlock.style.opacity = 0;
                 setTimeout(() => { historyBlock.style.transition = 'opacity 0.5s ease-in-out'; historyBlock.style.opacity = 1; }, 10);
+
+                if (save) {
+                    historyData.unshift(entry);
+                    saveHistory();
+                }
             }
 
             function createSenseCard(sense, items) {
