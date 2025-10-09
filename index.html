@@ -17,7 +17,6 @@
         - ✨ 登場人物のアイデア生成 (Character Idea Generation): Report Info -> 生成された情景。 Goal -> 物語を動かすキャラクターを創造する。 Viz/Presentation -> 結果エリアに追加される専用カード (HTML/CSS)。 Interaction -> 「登場人物を生成」ボタンでAPIを呼び出し、構造化されたキャラクタープロフィールを表示。 Justification -> 情景からキャラクターへと発想を広げ、物語の構成要素を具体化する新機能。
         - ✨ 登場人物のモノローグ生成 (Character Monologue Generation): Report Info -> 生成された情景や物語。 Goal -> キャラクターの心情や内面を掘り下げる。 Viz/Presentation -> 結果エリアに追加される専用カード (HTML/CSS)。 Interaction -> 「モノローグを生成」ボタンでAPIを呼び出し、キャラクターの心の声を表示。 Justification -> 情景描写からキャラクター描写へと創作の焦点を移行させ、物語に深みを与える新機能。
         - ✨ プロットアイデア生成 (Plot Idea Generation): Report Info -> 生成された情景や物語の冒頭。 Goal -> 物語の次の展開やプロットのヒントを提供する。 Viz/Presentation -> 結果エリアの最後に追加される専用カード (HTML/CSS)。 Interaction -> 「『次に何が起こる？』アイデアを生成」ボタンでAPIを呼び出し、3つの異なるプロット案を表示。 Justification -> 創作における「次の一手」を支援し、物語の停滞を防ぐ。アイデア出しからプロット構築までをシームレスに繋ぐ重要な機能。
-        - ✨ 登場人物の会話生成 (Character Conversation Generation): Report Info -> 生成された登場人物。 Goal -> 登場人物たちの間で交わされる、活き活きとした会話を生成する。 Viz/Presentation -> 結果エリアに追加される専用カード (HTML/CSS)。 Interaction -> 「この登場人物を使った会話を生成」ボタンでAPIを呼び出し、会話劇を生成・表示。 Justification -> キャラクターに命を吹き込み、物語のダイナミズムを高める。人物設定を実際の対話へと展開させることで、より具体的なストーリー創作を支援する。
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
@@ -33,11 +32,11 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        .output-card, .story-card, .plot-card, .monologue-card, .character-card, .conversation-card {
+        .output-card, .story-card, .plot-card, .monologue-card, .character-card {
             border-left: 4px solid;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .output-card:hover, .story-card:hover, .plot-card:hover, .monologue-card:hover, .character-card:hover, .conversation-card:hover {
+        .output-card:hover, .story-card:hover, .plot-card:hover, .monologue-card:hover, .character-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
         }
@@ -184,19 +183,7 @@
                    </div>
                </div>
 
-               <div id="conversation-section" class="hidden">
-                    <div class="conversation-card glass-card shadow-lg rounded-xl p-6 md:p-8" style="border-color: #14b8a6;">
-                       <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">✨ この登場人物を使った会話を生成</h2>
-                       <p class="text-gray-700 mb-6 text-sm">キャラクターに命を吹き込み、物語を動かすのは「会話」です。この機能を使えば、あなたの作ったキャラクターがどんな風に話し、他の人物とどう関わるのか、具体的なイメージを瞬時に得ることができます。人物描写をさらに深めたい時、物語の展開に悩んだ時に、きっと役立つはずです。</p>
-                       <button id="generate-conversation-btn" class="w-full bg-teal-500 text-white font-bold py-3 px-4 rounded-lg shadow-md flex items-center justify-center text-lg hover:bg-teal-600 transition disabled:bg-teal-300 disabled:cursor-not-allowed">
-                           <span id="conversation-btn-text">会話を生成</span>
-                            <div id="conversation-btn-loader" class="hidden w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                       </button>
-                       <div id="conversation-output-container" class="mt-6 hidden">
-                           <div id="conversation-output" class="p-4 bg-white/50 rounded-lg text-gray-800 border border-gray-200"></div>
-                       </div>
-                   </div>
-                </div>
+
 
                 <div id="plot-ideas-section" class="hidden">
                      <div class="plot-card glass-card shadow-lg rounded-xl p-6 md:p-8" style="border-color: #f97316;">
@@ -252,12 +239,7 @@
             const monologueOutputContainer = document.getElementById('monologue-output-container');
             const monologueOutput = document.getElementById('monologue-output');
 
-            const conversationSection = document.getElementById('conversation-section');
-            const generateConversationBtn = document.getElementById('generate-conversation-btn');
-            const conversationBtnText = document.getElementById('conversation-btn-text');
-            const conversationBtnLoader = document.getElementById('conversation-btn-loader');
-            const conversationOutputContainer = document.getElementById('conversation-output-container');
-            const conversationOutput = document.getElementById('conversation-output');
+
 
             const plotIdeasSection = document.getElementById('plot-ideas-section');
             const generatePlotBtn = document.getElementById('generate-plot-btn');
@@ -300,7 +282,7 @@
                 initialState.classList.add('hidden');
                 resultsState.classList.remove('visible', 'grid');
                 resultsState.classList.add('hidden');
-                [shortStorySection, plotIdeasSection, monologueSection, characterIdeasSection, conversationSection].forEach(section => {
+                [shortStorySection, plotIdeasSection, monologueSection, characterIdeasSection].forEach(section => {
                     section.classList.add('hidden');
                     section.classList.remove('visible');
                 });
@@ -533,43 +515,7 @@
                 }
             });
 
-            generateConversationBtn.addEventListener('click', async () => {
-                const scene = sceneInput.value.trim();
-                const characters = characterOutput.innerHTML;
-                if (!scene || !characters) return;
 
-                generateConversationBtn.disabled = true;
-                conversationBtnText.classList.add('hidden');
-                conversationBtnLoader.classList.remove('hidden');
-                conversationOutputContainer.classList.remove('hidden');
-                conversationOutput.textContent = '会話を生成中です...';
-
-                const systemPrompt = `あなたは才能あふれる脚本家です。与えられた情景と登場人物のプロフィールを基に、彼らの性格や状況が色濃く反映された、生き生きとした会話劇を創作してください。会話は自然で、キャラクターたちの関係性や個性が垣間見えるようにしてください。`;
-                const userQuery = `情景: ${scene}\n\n登場人物:\n${characters.replace(/<[^>]*>/g, '\n')}`;
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-                try {
-                    const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-
-                    if (!response.ok) { throw new Error(`API Error: ${response.statusText}`); }
-                    const result = await response.json();
-                    const conversationText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-
-                    if(conversationText) {
-                        conversationOutput.textContent = conversationText;
-                    } else {
-                        throw new Error('AIからの応答が不正です。');
-                    }
-                } catch (error) {
-                    console.error('Error generating conversation:', error);
-                    conversationOutput.textContent = '会話の生成中にエラーが発生しました。';
-                } finally {
-                    generateConversationBtn.disabled = false;
-                    conversationBtnText.classList.remove('hidden');
-                    conversationBtnLoader.classList.add('hidden');
-                }
-            });
             
             function displayResults(descriptions) {
                 resultsState.innerHTML = '';
@@ -586,7 +532,7 @@
                 setTimeout(() => resultsState.classList.add('visible'), 10);
                 
                 // Show subsequent sections
-                [shortStorySection, characterIdeasSection, monologueSection, conversationSection, plotIdeasSection].forEach(section => {
+                [shortStorySection, characterIdeasSection, monologueSection, plotIdeasSection].forEach(section => {
                     const outputContainer = section.querySelector('div[id$="-output-container"]');
                     const output = section.querySelector('div[id$="-output"]');
                     outputContainer.classList.add('hidden');
@@ -621,7 +567,7 @@
             function displayError() {
                 resultsState.classList.add('hidden');
                 resultsState.classList.remove('visible', 'grid');
-                [shortStorySection, plotIdeasSection, monologueSection, characterIdeasSection, conversationSection].forEach(section => {
+                [shortStorySection, plotIdeasSection, monologueSection, characterIdeasSection].forEach(section => {
                      section.classList.add('hidden');
                      section.classList.remove('visible');
                 });
