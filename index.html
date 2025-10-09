@@ -286,6 +286,7 @@
             });
 
             generateBtn.addEventListener('click', async () => {
+                console.log('Generate button clicked.'); // Debugging line
                 const scene = sceneInput.value.trim();
                 if (!scene) {
                     alert('情景・テーマを入力してください。');
